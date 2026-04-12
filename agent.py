@@ -77,14 +77,14 @@ def handle_rag_node(state: AgentState):
     user_msg = state["messages"][-1].content
     context = retrieve_knowledge(user_msg)
     
-    sys_prompt = SystemMessage(content=f\"\"\"
+    sys_prompt = SystemMessage(content=f"""
     You are a sales assistant for AutoStream. Answer the user's question using ONLY the following context.
     If the context does not contain the answer, politely say you don't have that information.
     Do not make up pricing or features.
     
     Context:
     {context}
-    \"\"\")
+    """)
     
     # We use conversation history and RAG context
     response = llm.invoke([sys_prompt] + state["messages"])

@@ -8,7 +8,7 @@ KNOWLEDGE_BASE_PATH = "knowledge_base.json"
 CHROMA_DB_DIR = "./chroma_db"
 
 def initialize_vector_store():
-    \"\"\"Initializes the vector store with documents from the knowledge base.\"\"\"
+    """Initializes the vector store with documents from the knowledge base."""
     # Load knowledge base
     if not os.path.exists(KNOWLEDGE_BASE_PATH):
         raise FileNotFoundError(f"{KNOWLEDGE_BASE_PATH} not found.")
@@ -35,7 +35,7 @@ def initialize_vector_store():
     return vectorstore
 
 def get_retriever():
-    \"\"\"Returns a retriever for the knowledge base.\"\"\"
+    """Returns a retriever for the knowledge base."""
     embeddings = OpenAIEmbeddings()
     # Check if DB already exists to avoid re-embedding on every run
     if os.path.exists(CHROMA_DB_DIR):
@@ -45,7 +45,7 @@ def get_retriever():
     return vectorstore.as_retriever(search_kwargs={"k": 2})
 
 def retrieve_knowledge(query: str) -> str:
-    \"\"\"Retrieves relevant knowledge for a given query.\"\"\"
+    """Retrieves relevant knowledge for a given query."""
     retriever = get_retriever()
     docs = retriever.invoke(query)
     if not docs:
