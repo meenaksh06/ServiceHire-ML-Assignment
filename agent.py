@@ -46,9 +46,10 @@ def detect_intent_node(state: AgentState):
     # We only look at the most recent message to determine current intent
     user_msg = state["messages"][-1].content
     # Include some context of previous messages potentially
-    prompt = f"Analyze the following user message and context, and determine their intent.\nUser Message: {user_msg}"
+    prompt = f"Analyze the following user message and context, and determine their intent.\\nUser Message: {user_msg}\\n\\nNOTE: If the user is answering a question by providing their name, email, or a platform (like YouTube, Instagram) because we asked for them during a sign-up/lead flow, YOU MUST CLASSIFY the intent as 'high_intent'."
     
     result = structured_llm.invoke([HumanMessage(content=prompt)])
+
     
     return {"intent": result.intent}
 

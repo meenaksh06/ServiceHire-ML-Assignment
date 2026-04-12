@@ -5,3 +5,5 @@ langgraph
 chromadb
 python-dotenv
 pydantic
+fastapi
+uvicorn
