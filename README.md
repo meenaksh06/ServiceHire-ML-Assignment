@@ -1,40 +1,67 @@
-# AutoStream Social-to-Lead Agent
+# AutoStream Social-to-Lead Conversational Agent
 
-An agentic AI workflow built for AutoStream to classify user intent, answer product questions via RAG, and autonomously capture leads using LangGraph, Python, and a sophisticated React Frontend.
+## Overview
 
-## How to run the project locally
+This repository contains an advanced conversational agent workflow developed for AutoStream. The system is designed to seamlessly classify user intent, answer product-related queries via Retrieval-Augmented Generation (RAG), and autonomously capture and qualify leads. The architecture leverages LangGraph for complex state management, Python (FastAPI) for robust backend execution, and React (Vite) for a professional, responsive frontend application.
 
-1. **Clone the repository** and navigate to the directory.
-2. **Setup the Python Environment** (Backend):
+## Prerequisites
+
+Ensure the following dependencies are installed prior to deployment:
+- Python 3.9+ 
+- Node.js (v18 or higher)
+- NPM or standard package manager
+
+## Local Setup and Installation
+
+### 1. Backend Configuration (FastAPI & LangGraph)
+
+1. Clone the repository and navigate to the project root directory.
+2. Initialize and activate a Python virtual environment:
    ```bash
    python3 -m venv venv
    source venv/bin/activate
+   ```
+3. Install the required Python dependencies:
+   ```bash
    pip install -r requirements.txt
    ```
-3. **Configure API Keys**: Copy `.env.example` to `.env` and add your `OPENAI_API_KEY`.
-4. **Start the Backend server**:
+4. Configure environment variables by duplicating `.env.example` to `.env` and supplying a valid OpenAI API key:
+   ```env
+   OPENAI_API_KEY=your_api_key_here
+   ```
+5. Start the underlying FastAPI backend server:
    ```bash
    uvicorn app:app --host 127.0.0.1 --port 8000
    ```
-5. **Start the Frontend UI**:
-   Open a new terminal and navigate to the `/frontend` directory:
+
+### 2. Frontend Configuration (React & Vite)
+
+1. Open a secondary terminal instance and navigate to the frontend directory:
    ```bash
    cd frontend
+   ```
+2. Install the necessary Node packages:
+   ```bash
    npm install
+   ```
+3. Boot the local development server:
+   ```bash
    npm run dev
    ```
-6. Open your browser to the local URL (usually `http://127.0.0.1:5173/`).
+4. Access the web interface via a standard browser routing to `http://127.0.0.1:5173/`.
 
-## Architecture Explanation
+## Architecture Overview
 
-This application utilizes a decoupled architecture featuring a **React (Vite)** frontend and a **FastAPI** backend that wraps a **LangGraph state machine**. LangGraph was chosen because conversational agent workflows require cyclic execution and memory retention that standard linear chains (like LCEL) cannot easily provide. By defining the agent as a finite state machine (`AgentState`), we can persistently store the conversation history alongside custom variables like `intent` and missing lead details (`lead_name`, `lead_email`, `lead_platform`).
+The application utilizes a decoupled, modern architecture:
+- **Frontend Layer**: Built using React and Vite. It communicates asynchronously with the backend API to render real-time state updates and manage conversational interface mechanics.
+- **Backend Layer & State Management**: The core logic is powered by a FastAPI layer wrapping a LangGraph state machine. LangGraph enables persistent cyclical execution and conversation memory. Through the `AgentState` paradigm, the server accurately tracks intent categorization and parses missing lead parameters (`lead_name`, `lead_email`, `lead_platform`) across multi-turn interactions.
+- **Intent Routing & RAG Execution**: Initial user input passes through a node executing an LLM-driven structured output parse. Based on classification, traffic routes either to a ChromaDB-backed RAG instance for product inquiries or to a qualification node that iteratively extracts entities for the final `mock_lead_capture` trigger.
 
-When a user sends a message, it enters the `detect_intent` node, where `gpt-4o-mini` uses structured output to classify the message. Based on this intent, conditional edges route the execution flow. A product query triggers the RAG node (utilizing ChromaDB and OpenAI Embeddings), while high-intent triggers a specialized lead qualification node that dynamically checks the `AgentState` for missing fields. Importantly, running this loop inside a native Python API rather than a hosted service allows us to seamlessly trigger the local `mock_lead_capture` tool when the state constraints are met, providing robust error handling and exposing live execution traces directly to the sophisticated React UI in real-time.
+## Deployment Integration: WhatsApp Webhook Strategy
 
-## WhatsApp Deployment Integration
+Deploying this LangGraph agent to external asynchronous messaging platforms such as WhatsApp requires the following infrastructural modifications:
 
-To integrate this sophisticated LangGraph agent with WhatsApp using Webhooks, the architecture would look like this:
-1. **Meta App Setup**: Create an application in the Meta Developer Portal and subscribe to WhatsApp Cloud API Webhooks.
-2. **Webhook Endpoint Mapping**: Extend the existing FastAPI backend with a new `GET /webhook` route (to handle Meta's verification challenge) and a `POST /webhook` route to receive real-time messages.
-3. **State Checkpointer Adaptation**: Instead of generating a random `thread_id` locally, the system will use the user's WhatsApp Phone Number (`WaId`) as the `thread_id` in LangGraph's checkpointer. This guarantees state memory across entirely asynchronous WhatsApp interactions.
-4. **Response Delivery**: Once LangGraph finishes processing its node execution (RAG query, asking for missing lead details, etc.), it outputs a string. The FastAPI endpoint will push that string payload securely back to the WhatsApp API to deliver the final response to the user's phone.
+1. **Meta Application Configuration**: Register the application in the Meta Developer Portal and subscribe the webhook endpoint to WhatsApp Cloud API events.
+2. **Endpoint Restructuring**: Expose `GET /webhook` to validate Meta verification challenges and `POST /webhook` to serialize incoming payload events.
+3. **Checkpointer Memory Management**: Map the incoming WhatsApp User ID (`WaId`) to the `thread_id` within the LangGraph checkpointer. This assures decoupled, persistent memory allocation per individual interacting over WhatsApp.
+4. **Asynchronous Dispatch**: Upon completion of the LangGraph execution cycle, the payload is directed to an outbound API call routing securely to Meta's message delivery endpoint, thereby closing the communication loop automatically.

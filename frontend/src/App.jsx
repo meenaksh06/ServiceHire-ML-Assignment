@@ -71,7 +71,6 @@ function App() {
       {/* Chat Section */}
       <div className="panel chat-section">
         <div className="chat-header">
-          <div style={{ fontSize: '1.5rem' }}>✨</div>
           <div>
             <h1>AutoStream Agent</h1>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Powered by LangGraph</div>
@@ -114,7 +113,7 @@ function App() {
       {/* Insights Section */}
       <div className="panel insights-section">
         <div className="insights-header">
-          <h2><span style={{ fontSize: '1.2rem' }}>🧠</span> Live AI Insights</h2>
+          <h2>Live AI Insights</h2>
         </div>
         
         <div className="insights-content">
@@ -149,7 +148,7 @@ function App() {
 
           {leadCaptured && (
             <div className="success-banner">
-              <h4>🎉 Tool Executed</h4>
+              <h4>Tool Executed</h4>
               <p>mock_lead_capture() called successfully</p>
             </div>
           )}
