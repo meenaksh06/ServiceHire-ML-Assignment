@@ -50,6 +50,16 @@ Ensure the following dependencies are installed prior to deployment:
    ```
 4. Access the web interface via a standard browser routing to `http://127.0.0.1:5173/`.
 
+## Conversational Workflow
+
+The system facilitates a dynamic, intent-driven conversational loop:
+
+1. **Initial Engagement (Greeting)**: The agent establishes context and initiates contact seamlessly.
+2. **Knowledge Retrieval (RAG)**: Upon receiving a product or pricing inquiry, the agent actively queries the integrated local knowledge base (AutoStream policies and tiers) and synthesizes a precise, contextual response.
+3. **Intent Shift & Detection**: The system continuously monitors user inputs. If the user pivots toward subscription or platform utilization, the state machine strictly transitions the global intent to `high_intent`.
+4. **Lead Qualification**: The agent evaluates the runtime state against a required entity schema (Name, Email, Creator Platform). It iterates dynamically, requesting any outstanding data fields until the schema validation succeeds.
+5. **Tool Execution**: Following strict, autonomous threshold validation, the local `mock_lead_capture` tool invokes, securing the generated lead data.
+
 ## Architecture Overview
 
 The application utilizes a decoupled, modern architecture:
